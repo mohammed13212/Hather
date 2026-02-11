@@ -1,0 +1,190 @@
+:root{
+  --bg:#0f1922; --g1:#2f7a3e; --g2:#2a6f38; --w:#fff;
+  --m:rgba(255,255,255,.78); --focus:rgba(255,255,255,.35);
+}
+
+*{ box-sizing:border-box; }
+html, body{ height:100%; }
+
+body{
+  margin:0;
+  font-family:"Tajawal",system-ui;
+  background:var(--bg);
+  color:var(--w);
+}
+
+/* "عرض كامل على اللابتوب" */
+.shell{
+  width:100vw;
+  height:100vh;
+  display:grid;
+  grid-template-columns:1.1fr 1fr;
+  overflow:hidden;
+}
+
+.left{
+  background:
+    radial-gradient(1200px 500px at 20% 20%,rgba(40,160,255,.12),transparent 60%),
+    linear-gradient(180deg,#121c27,#0b131b);
+}
+
+.right{
+  position:relative;
+  background:linear-gradient(180deg,var(--g1),var(--g2));
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:28px;
+}
+
+.brand{
+  position:absolute;
+  top:18px;
+  right:18px;
+  line-height:1.15;
+  text-align:right;
+  user-select:none;
+}
+.brand .ar{ font-weight:900; font-size:16px; }
+.brand .en{ font-weight:700; font-size:12px; opacity:.85; direction:ltr; }
+
+.card{
+  width:min(520px,92%);
+  text-align:center;
+  padding-top:34px;
+}
+
+h1{
+  margin:8px 0 6px;
+  font-size:clamp(40px,5vw,56px);
+  font-weight:800;
+}
+.sub{
+  margin:0 0 18px;
+  font-size:clamp(22px,3vw,30px);
+  font-weight:800;
+  opacity:.95;
+}
+
+/* "البار الأبيض: النصين صاروا absolute عشان ما يضغطون على مساحة الكتابة" */
+.field{
+  width:100%;
+  background:#fff;
+  border-radius:12px;
+  padding:14px 16px;
+  position:relative;
+  border:2px solid transparent;
+  box-shadow:0 10px 20px rgba(0,0,0,.18);
+  cursor:text;
+}
+
+.field:focus-within{
+  border-color:rgba(255,255,255,.55);
+  box-shadow:0 0 0 4px var(--focus),0 10px 20px rgba(0,0,0,.18);
+}
+
+.field.is-error{ border-color:rgba(217,45,32,.95); }
+.field.is-ok{ border-color:rgba(18,183,106,.95); }
+
+/* "النصوص داخل البار" */
+.tag{
+  position:absolute;
+  top:50%;
+  transform:translateY(-50%);
+  max-width:42%;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  font-weight:800;
+  font-size:14px;
+  color:#111;
+  opacity:.82;
+
+  /* "عشان ما تمنع الضغط/الكتابة" */
+  pointer-events:none;
+  user-select:none;
+}
+
+.tag.en{ left:16px; direction:ltr; text-align:left; }
+.tag.ar{ right:16px; direction:rtl; text-align:right; font-weight:900; opacity:.9; }
+
+/* "وقت التركيز أو وجود قيمة: نخفي الكلام عشان الكتابة تكون واضحة" */
+.field:focus-within .tag{ opacity:0; }
+.field.has-value .tag{ opacity:0; }
+
+/* "الـ input صار عرض كامل، ومضاف له padding عشان ما يتداخل مع النصين" */
+input{
+  width:100%;
+  border:0;
+  outline:0;
+  background:transparent;
+  color:#111;
+  font-size:18px;
+  font-weight:900;
+  direction:ltr;
+  text-align:left;
+  caret-color:#111;
+
+  /* "مساحة على اليمين واليسار بسبب النصين" */
+  padding-left:190px;
+  padding-right:190px;
+}
+
+/* "وقت الكتابة: نخلي الـ input يستغل المساحة كاملة" */
+.field:focus-within input,
+.field.has-value input{
+  padding-left:0;
+  padding-right:0;
+}
+
+.help{
+  margin:10px 2px 0;
+  font-size:13px;
+  color:rgba(255,255,255,.82);
+  min-height:18px;
+}
+
+.btn{
+  margin-top:14px;
+  width:100%;
+  border:0;
+  border-radius:12px;
+  background:#fff;
+  color:#111;
+  font-weight:900;
+  font-size:18px;
+  padding:14px 16px;
+  cursor:pointer;
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  direction:ltr;
+  box-shadow:0 12px 22px rgba(0,0,0,.22);
+}
+.btn .en{ text-align:left; direction:ltr; }
+.btn .ar{ text-align:right; direction:rtl; }
+.btn:disabled{ opacity:.75; cursor:not-allowed; }
+
+.status{
+  margin-top:14px;
+  font-size:14px;
+  color:var(--m);
+  min-height:20px;
+}
+
+/* "تابلت وجوال" */
+@media (max-width: 900px){
+  .shell{ grid-template-columns:1fr; }
+  .left{ display:none; }
+  .card{ padding-top:44px; }
+  input{ padding-left:160px; padding-right:160px; }
+}
+
+/* "جوال صغير: نخفي النصوص داخل البار نهائيًا" */
+@media (max-width: 520px){
+  .tag{ display:none; }
+  input{
+    padding-left:0;
+    padding-right:0;
+    text-align:center;
+  }
+}
