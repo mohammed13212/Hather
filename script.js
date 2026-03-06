@@ -1,7 +1,8 @@
 const SCRIPT_URL =
-"https://script.google.com/macros/s/AKfycbxdJNFo8oTpzr-Q6p2gBctKE3pbWw6Ueo351r-GjM6m2GraNN_gQsMKvi_j9P7MX0yq/exec";
+"https://script.google.com/macros/s/AKfycbz022Vibr0kQpcExUbkIab2tEqiRfa60YVZbtmqjU4q6lPgsN8V7j4qG5vMyjGWBLU-/exec";
 
 const TEACHER_PASSWORD = "1111";
+const QR_ROTATE_MS = 20000;
 
 const form = document.getElementById("form");
 const uid = document.getElementById("uid");
@@ -15,6 +16,7 @@ const sessionBox = document.getElementById("sessionBox");
 const courseValue = document.getElementById("courseValue");
 const sectionValue = document.getElementById("sectionValue");
 const lectureValue = document.getElementById("lectureValue");
+const windowValue = document.getElementById("windowValue");
 
 const teacherFab = document.getElementById("teacherFab");
 const teacherModal = document.getElementById("teacherModal");
@@ -39,19 +41,28 @@ const teacherStatus = document.getElementById("teacherStatus");
 const courseInput = document.getElementById("course");
 const sectionInput = document.getElementById("section");
 const lectureInput = document.getElementById("lecture");
+const windowMinutesInput = document.getElementById("windowMinutes");
 
 let loading = false;
+let qrTimer = null;
+let activeTeacherSession = null;
+let lastQrSlot = null;
 
 const params = new URLSearchParams(window.location.search);
 const course = (params.get("course") || "").trim();
 const section = (params.get("section") || "").trim();
 const lecture = (params.get("lecture") || "").trim();
+const generatedAt = (params.get("generatedAt") || "").trim();
+const windowMinutes = (params.get("windowMinutes") || "").trim();
+const token = (params.get("token") || "").trim();
+const slot = (params.get("slot") || "").trim();
 
-if (course || section || lecture) {
+if (course || section || lecture || windowMinutes) {
   sessionBox.classList.remove("hidden");
   courseValue.textContent = course || "—";
   sectionValue.textContent = section || "—";
   lectureValue.textContent = lecture || "—";
+  windowValue.textContent = windowMinutes ? `${windowMinutes} min` : "—";
 }
 
 const norm = (v) => {
@@ -101,7 +112,7 @@ function validate() {
 
 uid.addEventListener("input", validate);
 
-function jsonpSend(studentId) {
+function jsonpRequest(paramsObj) {
   return new Promise((resolve, reject) => {
     const cb = "cb_" + Date.now() + "_" + Math.floor(Math.random() * 10000);
     const s = document.createElement("script");
@@ -122,10 +133,7 @@ function jsonpSend(studentId) {
     };
 
     const query = new URLSearchParams({
-      uid: studentId,
-      course,
-      section,
-      lecture,
+      ...paramsObj,
       callback: cb
     });
 
@@ -141,6 +149,126 @@ function jsonpSend(studentId) {
   });
 }
 
+function getCurrentSlot() {
+  return Math.floor(Date.now() / QR_ROTATE_MS);
+}
+
+function getSecondsToNextRotation() {
+  return Math.ceil((QR_ROTATE_MS - (Date.now() % QR_ROTATE_MS)) / 1000);
+}
+
+function isTeacherSessionExpired() {
+  if (!activeTeacherSession) return true;
+
+  const start = Number(activeTeacherSession.generatedAt);
+  const minutes = Number(activeTeacherSession.windowMinutes);
+
+  if (!start || !minutes) return true;
+
+  return Date.now() > (start + minutes * 60 * 1000);
+}
+
+async function refreshTeacherQr(force = false) {
+  if (!activeTeacherSession) return;
+
+  if (isTeacherSessionExpired()) {
+    stopQrRotation();
+    teacherStatus.textContent = "انتهت مدة جلسة الحضور. أنشئ QR جديد.";
+    teacherStatus.className = "teacher-status error";
+    return;
+  }
+
+  const currentSlot = getCurrentSlot();
+
+  if (!force && currentSlot === lastQrSlot) {
+    updateTeacherCountdownOnly();
+    return;
+  }
+
+  try {
+    const res = await jsonpRequest({
+      action: "generateToken",
+      course: activeTeacherSession.course,
+      section: activeTeacherSession.section,
+      lecture: activeTeacherSession.lecture,
+      generatedAt: activeTeacherSession.generatedAt,
+      windowMinutes: activeTeacherSession.windowMinutes,
+      slot: currentSlot
+    });
+
+    if (!res || res.status !== "ok") {
+      teacherStatus.textContent = (res && res.message) ? res.message : "تعذر توليد QR.";
+      teacherStatus.className = "teacher-status error";
+      return;
+    }
+
+    lastQrSlot = currentSlot;
+
+    const url = new URL(window.location.origin + window.location.pathname);
+    url.searchParams.set("course", activeTeacherSession.course);
+    url.searchParams.set("section", activeTeacherSession.section);
+    url.searchParams.set("lecture", activeTeacherSession.lecture);
+    url.searchParams.set("generatedAt", activeTeacherSession.generatedAt);
+    url.searchParams.set("windowMinutes", activeTeacherSession.windowMinutes);
+    url.searchParams.set("slot", String(res.slot));
+    url.searchParams.set("token", res.token);
+
+    const finalUrl = url.toString();
+
+    generatedUrl.value = finalUrl;
+    qrImage.src =
+      "https://api.qrserver.com/v1/create-qr-code/?size=220x220&data=" +
+      encodeURIComponent(finalUrl);
+
+    teacherResult.classList.remove("hidden");
+    updateTeacherCountdownOnly();
+  } catch (err) {
+    teacherStatus.textContent = "تعذر تحديث QR.";
+    teacherStatus.className = "teacher-status error";
+  }
+}
+
+function updateTeacherCountdownOnly() {
+  if (!activeTeacherSession) return;
+
+  if (isTeacherSessionExpired()) {
+    stopQrRotation();
+    teacherStatus.textContent = "انتهت مدة جلسة الحضور. أنشئ QR جديد.";
+    teacherStatus.className = "teacher-status error";
+    return;
+  }
+
+  const seconds = getSecondsToNextRotation();
+  teacherStatus.textContent = `تم توليد الرابط بنجاح. سيتغير QR بعد ${seconds} ثانية.`;
+  teacherStatus.className = "teacher-status success";
+}
+
+function startQrRotation() {
+  stopQrRotation();
+
+  refreshTeacherQr(true);
+
+  qrTimer = setInterval(() => {
+    if (!activeTeacherSession) return;
+
+    const currentSlot = getCurrentSlot();
+
+    if (currentSlot !== lastQrSlot) {
+      refreshTeacherQr(true);
+    } else {
+      updateTeacherCountdownOnly();
+    }
+  }, 1000);
+}
+
+function stopQrRotation() {
+  if (qrTimer) {
+    clearInterval(qrTimer);
+    qrTimer = null;
+  }
+  lastQrSlot = null;
+}
+
 form.addEventListener("submit", async (e) => {
   e.preventDefault();
 
@@ -151,19 +279,36 @@ form.addEventListener("submit", async (e) => {
     return;
   }
 
+  if (!generatedAt || !windowMinutes || !token || !slot) {
+    setStatus("رابط الحضور غير مكتمل أو انتهت صلاحيته", "error");
+    return;
+  }
+
   loading = true;
   setButtonState();
   setStatus("جاري التسجيل...", "");
 
   try {
-    const res = await jsonpSend(uid.value);
+    const res = await jsonpRequest({
+      action: "submitAttendance",
+      uid: uid.value,
+      course,
+      section,
+      lecture,
+      generatedAt,
+      windowMinutes,
+      token,
+      slot
+    });
 
     if (res && res.status === "ok") {
-      setStatus("تم تسجيل الحضور بنجاح", "success");
+      setStatus("✅ تم تسجيل الحضور بنجاح", "success");
       uid.value = "";
       fieldBox.classList.remove("has-value");
     } else if (res && res.status === "exists") {
-      setStatus("تم تسجيل حضورك مسبقًا لهذه المحاضرة", "success");
+      setStatus("⚠️ تم تسجيل حضورك مسبقًا لهذه المحاضرة", "success");
+    } else if (res && res.status === "expired") {
+      setStatus("⛔ انتهت مدة تسجيل الحضور أو انتهت صلاحية QR", "error");
     } else {
       setStatus((res && res.message) ? res.message : "حدث خطأ، حاول مرة أخرى", "error");
     }
@@ -186,6 +331,7 @@ function openTeacherModal() {
 
 function closeTeacherModal() {
   teacherModal.classList.add("hidden");
+  stopQrRotation();
 }
 
 teacherFab.addEventListener("click", openTeacherModal);
@@ -219,29 +365,24 @@ teacherForm.addEventListener("submit", (e) => {
   const c = courseInput.value.trim();
   const s = sectionInput.value.trim();
   const l = lectureInput.value.trim();
+  const wm = windowMinutesInput.value.trim();
 
-  if (!c || !s || !l) {
+  if (!c || !s || !l || !wm) {
     teacherResult.classList.add("hidden");
-    teacherStatus.textContent = "أدخل Course و Section و Lecture أولًا.";
+    teacherStatus.textContent = "أدخل Course و Section و Lecture ومدة فتح الحضور أولًا.";
     teacherStatus.className = "teacher-status error";
     return;
   }
 
-  const url = new URL(window.location.origin + window.location.pathname);
-  url.searchParams.set("course", c);
-  url.searchParams.set("section", s);
-  url.searchParams.set("lecture", l);
+  activeTeacherSession = {
+    course: c,
+    section: s,
+    lecture: l,
+    windowMinutes: wm,
+    generatedAt: Date.now().toString()
+  };
 
-  const finalUrl = url.toString();
-
-  generatedUrl.value = finalUrl;
-  qrImage.src =
-    "https://api.qrserver.com/v1/create-qr-code/?size=220x220&data=" +
-    encodeURIComponent(finalUrl);
-
-  teacherResult.classList.remove("hidden");
-  teacherStatus.textContent = "تم توليد الرابط والـ QR بنجاح.";
-  teacherStatus.className = "teacher-status success";
+  startQrRotation();
 });
 
 copyBtn.addEventListener("click", async () => {
