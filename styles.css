@@ -181,10 +181,32 @@ input{
 
 /* "جوال صغير: نخفي النصوص داخل البار نهائيًا" */
 @media (max-width: 520px){
-  .tag{ display:none; }
+  /* "نخلي الشعار يبان وما ينقص" */
+  .brand{
+    top:14px;
+    right:14px;
+  }
+  .brand .ar{ font-size:14px; }
+  .brand .en{ font-size:11px; }
+
+  /* "نرجع النصوص داخل البار" */
+  .tag{ display:block; }
+
+  /* "نخلي النصوص أصغر شوي عشان ما تزحم" */
+  .tag{ font-size:12px; max-width:45%; }
+
+  /* "input يكون واضح ومركز" */
   input{
-    padding-left:0;
-    padding-right:0;
+    padding-left:140px;
+    padding-right:140px;
     text-align:center;
   }
+
+  /* "وقت الكتابة: نخفي النصوص ونخلي المساحة كاملة" */
+  .field:focus-within input,
+  .field.has-value input{
+    padding-left:0;
+    padding-right:0;
+  }
 }
+
