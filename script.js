@@ -1,5 +1,5 @@
 const SCRIPT_URL =
-"https://script.google.com/macros/s/AKfycbxr8KkRIrpfWKj2PPHdQ4P4kAB45PjrtQRJs_-qFSGqJhhgoAFEAkhYXn8U8QcX1AKA/exec";
+"https://script.google.com/macros/s/AKfycbxdJNFo8oTpzr-Q6p2gBctKE3pbWw6Ueo351r-GjM6m2GraNN_gQsMKvi_j9P7MX0yq/exec";
 
 const TEACHER_PASSWORD = "1111";
 
