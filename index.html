@@ -1,21 +1,19 @@
 <!doctype html>
 <html lang="ar" dir="rtl">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>جامعة الحدود الشمالية | حاضر</title>
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800&display=swap" rel="stylesheet">
 
   <link rel="stylesheet" href="styles.css">
 </head>
-
 <body>
-  <main class="shell">
-    <section class="left" aria-hidden="true"></section>
 
+  <main class="shell">
     <section class="right">
       <div class="brand">
         <div class="ar">جامعة الحدود الشمالية</div>
@@ -25,35 +23,117 @@
       <div class="card">
         <h1>Hather</h1>
         <div class="sub">حاضر</div>
+        <div class="desc">سجّل حضورك بسرعة باستخدام الرقم الجامعي</div>
 
-        <form id="form" novalidate>
+        <div class="session-box hidden" id="sessionBox">
+          <div class="session-title">تفاصيل المحاضرة</div>
+          <div class="session-grid">
+            <div class="session-item">
+              <span class="label">Course</span>
+              <span class="value" id="courseValue">—</span>
+            </div>
+            <div class="session-item">
+              <span class="label">Section</span>
+              <span class="value" id="sectionValue">—</span>
+            </div>
+            <div class="session-item">
+              <span class="label">Lecture</span>
+              <span class="value" id="lectureValue">—</span>
+            </div>
+          </div>
+        </div>
+
+        <form id="form">
           <div class="field" id="fieldBox">
             <div class="tag en">Enter university ID</div>
 
             <input
-  id="uid"
-  type="text"
-  inputmode="numeric"
-  maxlength="9"
-  autocomplete="off"
-/>
-
+              id="uid"
+              type="text"
+              maxlength="9"
+              inputmode="numeric"
+              placeholder="ادخل رقمك الجامعي"
+              autocomplete="off"
+            >
 
             <div class="tag ar">ادخل الرقم الطلابي</div>
           </div>
 
-          <div class="help" id="help">"أدخل الرقم الجامعي 9 أرقام."</div>
+          <div class="help">أدخل الرقم الجامعي 9 أرقام.</div>
 
           <button class="btn" id="btn" type="submit" disabled>
-            <span class="en">Check in</span>
-            <span class="ar">اضغط هنا</span>
+            <span class="en" id="btnEn">Check in</span>
+            <span class="ar" id="btnAr">اضغط هنا</span>
           </button>
 
-          <div class="status" id="status" aria-live="polite"></div>
+          <div class="status" id="status"></div>
         </form>
       </div>
     </section>
   </main>
+
+  <button class="teacher-fab" id="teacherFab" type="button" title="لوحة المدرس">👨‍🏫</button>
+
+  <div class="teacher-modal hidden" id="teacherModal">
+    <div class="teacher-panel teacher-password-panel" id="teacherPasswordPanel">
+      <button class="teacher-close" id="teacherClose" type="button">×</button>
+
+      <h2>دخول المدرس</h2>
+      <p class="teacher-desc">أدخل الرقم السري لفتح لوحة إنشاء QR</p>
+
+      <form id="teacherPasswordForm" class="teacher-form">
+        <div class="teacher-field">
+          <label for="teacherPassword">الرقم السري</label>
+          <input id="teacherPassword" type="password" placeholder="ادخل الرقم السري" autocomplete="off">
+        </div>
+
+        <button class="teacher-generate" type="submit">دخول</button>
+      </form>
+
+      <div class="teacher-status" id="teacherPasswordStatus">هذه اللوحة خاصة بالمدرس.</div>
+    </div>
+
+    <div class="teacher-panel teacher-main-panel hidden" id="teacherMainPanel">
+      <button class="teacher-close" id="teacherCloseMain" type="button">×</button>
+
+      <h2>لوحة المدرس</h2>
+      <p class="teacher-desc">أدخل بيانات المحاضرة وسيتم توليد الرابط وQR مباشرة</p>
+
+      <form id="teacherForm" class="teacher-form">
+        <div class="teacher-field">
+          <label for="course">Course</label>
+          <input id="course" type="text" placeholder="مثال: CPCS212" autocomplete="off">
+        </div>
+
+        <div class="teacher-field">
+          <label for="section">Section</label>
+          <input id="section" type="text" placeholder="مثال: 1" autocomplete="off">
+        </div>
+
+        <div class="teacher-field">
+          <label for="lecture">Lecture</label>
+          <input id="lecture" type="text" placeholder="مثال: 1" autocomplete="off">
+        </div>
+
+        <button class="teacher-generate" type="submit">Generate QR</button>
+      </form>
+
+      <div class="teacher-result hidden" id="teacherResult">
+        <label class="result-label" for="generatedUrl">Attendance URL</label>
+
+        <div class="generated-link-wrap">
+          <input id="generatedUrl" type="text" readonly>
+          <button class="copy-btn" id="copyBtn" type="button">نسخ</button>
+        </div>
+
+        <div class="qr-wrap">
+          <img id="qrImage" alt="Attendance QR">
+        </div>
+      </div>
+
+      <div class="teacher-status" id="teacherStatus">أدخل البيانات ثم اضغط Generate QR</div>
+    </div>
+  </div>
 
   <script src="script.js"></script>
 </body>

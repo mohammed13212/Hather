@@ -1,212 +1,699 @@
-:root{
-  --bg:#0f1922; --g1:#2f7a3e; --g2:#2a6f38; --w:#fff;
-  --m:rgba(255,255,255,.78); --focus:rgba(255,255,255,.35);
+*{
+  box-sizing:border-box;
+  margin:0;
+  padding:0;
 }
 
-*{ box-sizing:border-box; }
-html, body{ height:100%; }
+:root{
+  --bg1:#2f7d3c;
+  --bg2:#256a33;
+  --card-bg:rgba(255,255,255,.16);
+  --card-border:rgba(255,255,255,.18);
+  --white:#ffffff;
+  --soft-white:rgba(255,255,255,.88);
+  --input-bg:rgba(255,255,255,.96);
+  --input-text:#1f2937;
+  --btn-bg:#e9efe9;
+  --btn-text:#18311d;
+  --btn-disabled:#c8d2c9;
+  --shadow:0 24px 60px rgba(0,0,0,.18);
+  --radius-xl:28px;
+  --radius-lg:22px;
+}
+
+html,body{
+  width:100%;
+  min-height:100%;
+}
 
 body{
-  margin:0;
-  font-family:"Tajawal",system-ui;
-  background:var(--bg);
-  color:var(--w);
-}
-
-/* "عرض كامل على اللابتوب" */
-.shell{
-  width:100vw;
-  height:100vh;
-  display:grid;
-  grid-template-columns:1.1fr 1fr;
-  overflow:hidden;
-}
-
-.left{
+  font-family:'Tajawal',sans-serif;
+  min-height:100vh;
   background:
-    radial-gradient(1200px 500px at 20% 20%,rgba(40,160,255,.12),transparent 60%),
-    linear-gradient(180deg,#121c27,#0b131b);
+    radial-gradient(circle at top left, rgba(255,255,255,.10) 0, rgba(255,255,255,0) 26%),
+    radial-gradient(circle at bottom right, rgba(255,255,255,.08) 0, rgba(255,255,255,0) 22%),
+    linear-gradient(135deg,var(--bg1),var(--bg2));
+  overflow-x:hidden;
+  position:relative;
+}
+
+body::before,
+body::after{
+  content:"";
+  position:fixed;
+  border-radius:50%;
+  pointer-events:none;
+  filter:blur(10px);
+  opacity:.22;
+}
+
+body::before{
+  width:340px;
+  height:340px;
+  top:-90px;
+  left:-90px;
+  background:rgba(255,255,255,.13);
+}
+
+body::after{
+  width:280px;
+  height:280px;
+  right:-80px;
+  bottom:-80px;
+  background:rgba(255,255,255,.09);
+}
+
+.shell{
+  min-height:100vh;
+  width:100%;
+  display:block;
 }
 
 .right{
+  min-height:100vh;
+  width:100%;
   position:relative;
-  background:linear-gradient(180deg,var(--g1),var(--g2));
   display:flex;
   align-items:center;
   justify-content:center;
-  padding:28px;
+  padding:120px 20px 40px;
 }
 
 .brand{
   position:absolute;
-  top:18px;
-  right:18px;
-  line-height:1.15;
+  top:28px;
+  right:34px;
   text-align:right;
-  user-select:none;
+  color:var(--white);
+  line-height:1.15;
+  z-index:2;
 }
-.brand .ar{ font-weight:900; font-size:16px; }
-.brand .en{ font-weight:700; font-size:12px; opacity:.85; direction:ltr; }
+
+.brand .ar{
+  font-size:24px;
+  font-weight:800;
+  letter-spacing:.2px;
+}
+
+.brand .en{
+  font-size:14px;
+  font-weight:700;
+  opacity:.94;
+}
 
 .card{
-  width:min(520px,92%);
+  width:min(100%,760px);
+  padding:46px 42px 34px;
+  border-radius:var(--radius-xl);
+  background:var(--card-bg);
+  border:1px solid var(--card-border);
+  backdrop-filter:blur(12px);
+  -webkit-backdrop-filter:blur(12px);
+  box-shadow:var(--shadow);
   text-align:center;
-  padding-top:34px;
+  color:var(--white);
 }
 
-h1{
-  margin:8px 0 6px;
-  font-size:clamp(40px,5vw,56px);
+.card h1{
+  font-size:56px;
   font-weight:800;
+  line-height:1;
+  margin-bottom:10px;
+  letter-spacing:.4px;
 }
+
 .sub{
-  margin:0 0 18px;
-  font-size:clamp(22px,3vw,30px);
+  font-size:38px;
   font-weight:800;
-  opacity:.95;
+  margin-bottom:8px;
 }
 
-/* "البار الأبيض: النصين صاروا absolute عشان ما يضغطون على مساحة الكتابة" */
-.field{
+.desc{
+  font-size:17px;
+  color:var(--soft-white);
+  margin-bottom:26px;
+}
+
+.session-box{
   width:100%;
-  background:#fff;
-  border-radius:12px;
-  padding:14px 16px;
+  margin-bottom:20px;
+  padding:18px;
+  border-radius:20px;
+  background:rgba(255,255,255,.10);
+  border:1px solid rgba(255,255,255,.15);
+  text-align:right;
+}
+
+.session-title{
+  font-size:16px;
+  font-weight:800;
+  margin-bottom:14px;
+  color:#fff;
+}
+
+.session-grid{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:12px;
+}
+
+.session-item{
+  background:rgba(255,255,255,.10);
+  border-radius:16px;
+  padding:12px;
+  text-align:center;
+}
+
+.session-item .label{
+  display:block;
+  font-size:13px;
+  color:rgba(255,255,255,.75);
+  margin-bottom:6px;
+}
+
+.session-item .value{
+  display:block;
+  font-size:16px;
+  font-weight:800;
+  color:#fff;
+  word-break:break-word;
+}
+
+form{
+  width:100%;
+}
+
+.field{
   position:relative;
+  width:100%;
+  min-height:86px;
+  background:var(--input-bg);
+  border-radius:var(--radius-lg);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:0 24px;
+  overflow:hidden;
   border:2px solid transparent;
-  box-shadow:0 10px 20px rgba(0,0,0,.18);
-  cursor:text;
+  transition:border-color .18s ease, box-shadow .18s ease, transform .18s ease;
 }
 
 .field:focus-within{
-  border-color:rgba(255,255,255,.55);
-  box-shadow:0 0 0 4px var(--focus),0 10px 20px rgba(0,0,0,.18);
+  border-color:rgba(255,255,255,.50);
+  box-shadow:0 0 0 6px rgba(255,255,255,.10);
+  transform:translateY(-1px);
 }
 
-.field.is-error{ border-color:rgba(217,45,32,.95); }
-.field.is-ok{ border-color:rgba(18,183,106,.95); }
+.field input{
+  width:100%;
+  height:86px;
+  border:none;
+  outline:none;
+  background:transparent;
+  font-size:30px;
+  font-weight:700;
+  color:var(--input-text);
+  text-align:center;
+  font-family:'Tajawal',sans-serif;
+}
 
-/* "النصوص داخل البار" */
+.field input::placeholder{
+  color:transparent;
+}
+
 .tag{
   position:absolute;
   top:50%;
   transform:translateY(-50%);
-  max-width:42%;
-  white-space:nowrap;
-  overflow:hidden;
-  text-overflow:ellipsis;
-  font-weight:800;
-  font-size:14px;
-  color:#111;
-  opacity:.82;
-
-  /* "عشان ما تمنع الضغط/الكتابة" */
-  pointer-events:none;
-  user-select:none;
-}
-
-.tag.en{ left:16px; direction:ltr; text-align:left; }
-.tag.ar{ right:16px; direction:rtl; text-align:right; font-weight:900; opacity:.9; }
-
-/* "وقت التركيز أو وجود قيمة: نخفي الكلام عشان الكتابة تكون واضحة" */
-.field:focus-within .tag{ opacity:0; }
-.field.has-value .tag{ opacity:0; }
-
-/* "الـ input صار عرض كامل، ومضاف له padding عشان ما يتداخل مع النصين" */
-input{
-  width:100%;
-  border:0;
-  outline:0;
-  background:transparent;
-  color:#111;
+  color:#1f2937;
+  font-weight:700;
   font-size:18px;
-  font-weight:900;
-  direction:ltr;
-  text-align:left;
-  caret-color:#111;
-
-  /* "مساحة على اليمين واليسار بسبب النصين" */
-  padding-left:190px;
-  padding-right:190px;
+  pointer-events:none;
+  transition:opacity .2s ease, transform .2s ease;
 }
 
-/* "وقت الكتابة: نخلي الـ input يستغل المساحة كاملة" */
-.field:focus-within input,
-.field.has-value input{
-  padding-left:0;
-  padding-right:0;
+.tag.en{
+  left:26px;
+}
+
+.tag.ar{
+  right:26px;
+}
+
+.field:focus-within .tag,
+.field.has-value .tag{
+  opacity:0;
+  transform:translateY(-50%) scale(.96);
 }
 
 .help{
-  margin:10px 2px 0;
-  font-size:13px;
-  color:rgba(255,255,255,.82);
-  min-height:18px;
+  margin-top:16px;
+  margin-bottom:20px;
+  color:var(--soft-white);
+  font-size:17px;
+  text-align:center;
 }
 
 .btn{
-  margin-top:14px;
   width:100%;
-  border:0;
-  border-radius:12px;
-  background:#fff;
-  color:#111;
-  font-weight:900;
-  font-size:18px;
-  padding:14px 16px;
+  min-height:82px;
+  border:none;
+  border-radius:var(--radius-lg);
+  background:var(--btn-bg);
+  color:var(--btn-text);
   cursor:pointer;
-  display:grid;
-  grid-template-columns:1fr 1fr;
-  direction:ltr;
-  box-shadow:0 12px 22px rgba(0,0,0,.22);
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  padding:0 28px;
+  font-family:'Tajawal',sans-serif;
+  font-size:20px;
+  font-weight:800;
+  box-shadow:0 12px 28px rgba(0,0,0,.18);
+  transition:transform .16s ease, box-shadow .16s ease, opacity .16s ease, background .16s ease;
 }
-.btn .en{ text-align:left; direction:ltr; }
-.btn .ar{ text-align:right; direction:rtl; }
-.btn:disabled{ opacity:.75; cursor:not-allowed; }
+
+.btn:hover:not(:disabled){
+  transform:translateY(-2px);
+  box-shadow:0 16px 34px rgba(0,0,0,.20);
+}
+
+.btn:active:not(:disabled){
+  transform:translateY(0);
+}
+
+.btn:disabled{
+  background:var(--btn-disabled);
+  color:#35503a;
+  cursor:not-allowed;
+  opacity:.86;
+  box-shadow:none;
+}
+
+.btn .en,
+.btn .ar{
+  font-size:20px;
+  font-weight:800;
+}
 
 .status{
-  margin-top:14px;
+  margin-top:18px;
+  min-height:30px;
+  text-align:center;
+  color:var(--white);
+  font-size:17px;
+  font-weight:700;
+  opacity:0;
+  transform:translateY(6px);
+  transition:opacity .28s ease, transform .28s ease;
+}
+
+.status.show{
+  opacity:1;
+  transform:translateY(0);
+}
+
+.status.success{
+  color:#f3fff3;
+}
+
+.status.error{
+  color:#fff2f2;
+}
+
+.hidden{
+  display:none !important;
+}
+
+/* teacher button */
+.teacher-fab{
+  position:fixed;
+  left:20px;
+  bottom:20px;
+  width:58px;
+  height:58px;
+  border:none;
+  border-radius:50%;
+  background:#ffffff;
+  color:#18311d;
+  font-size:24px;
+  cursor:pointer;
+  box-shadow:0 12px 28px rgba(0,0,0,.22);
+  z-index:20;
+}
+
+/* modal */
+.teacher-modal{
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,.35);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:20px;
+  z-index:30;
+}
+
+.teacher-panel{
+  width:min(100%,430px);
+  background:#ffffff;
+  color:#1f2937;
+  border-radius:22px;
+  padding:18px;
+  position:relative;
+  box-shadow:0 24px 60px rgba(0,0,0,.25);
+  max-height:90vh;
+  overflow:auto;
+}
+
+.teacher-password-panel{
+  width:min(100%,360px);
+}
+
+.teacher-main-panel{
+  width:min(100%,430px);
+}
+
+.teacher-close{
+  position:absolute;
+  top:10px;
+  left:10px;
+  width:34px;
+  height:34px;
+  border:none;
+  border-radius:50%;
+  background:#eef2ee;
+  font-size:22px;
+  cursor:pointer;
+}
+
+.teacher-panel h2{
+  font-size:24px;
+  margin-bottom:6px;
+}
+
+.teacher-desc{
   font-size:14px;
-  color:var(--m);
-  min-height:20px;
+  color:#4b5563;
+  margin-bottom:14px;
+  line-height:1.7;
 }
 
-/* "تابلت وجوال" */
-@media (max-width: 900px){
-  .shell{ grid-template-columns:1fr; }
-  .left{ display:none; }
-  .card{ padding-top:44px; }
-  input{ padding-left:160px; padding-right:160px; }
+.teacher-form{
+  display:grid;
+  gap:12px;
 }
 
-/* "جوال صغير: نخفي النصوص داخل البار نهائيًا" */
-@media (max-width: 520px){
-  /* "نخلي الشعار يبان وما ينقص" */
+.teacher-field{
+  text-align:right;
+}
+
+.teacher-field label{
+  display:block;
+  margin-bottom:6px;
+  font-size:13px;
+  font-weight:700;
+}
+
+.teacher-field input{
+  width:100%;
+  height:50px;
+  border:1px solid #d6ddd7;
+  outline:none;
+  border-radius:14px;
+  padding:0 14px;
+  font-family:'Tajawal',sans-serif;
+  font-size:16px;
+  background:#fff;
+  color:#1f2937;
+}
+
+.teacher-generate{
+  width:100%;
+  height:52px;
+  border:none;
+  border-radius:14px;
+  background:#2f7d3c;
+  color:#fff;
+  font-family:'Tajawal',sans-serif;
+  font-size:17px;
+  font-weight:800;
+  cursor:pointer;
+}
+
+.teacher-result{
+  margin-top:14px;
+  padding-top:14px;
+  border-top:1px solid #e5e7eb;
+}
+
+.result-label{
+  display:block;
+  font-size:13px;
+  font-weight:700;
+  margin-bottom:6px;
+}
+
+.generated-link-wrap{
+  display:flex;
+  gap:8px;
+  align-items:center;
+  margin-bottom:14px;
+}
+
+.generated-link-wrap input{
+  flex:1;
+  height:46px;
+  border:1px solid #d6ddd7;
+  outline:none;
+  border-radius:12px;
+  padding:0 12px;
+  font-family:'Tajawal',sans-serif;
+  font-size:13px;
+  direction:ltr;
+}
+
+.copy-btn{
+  height:46px;
+  border:none;
+  border-radius:12px;
+  padding:0 14px;
+  background:#eef2ee;
+  color:#18311d;
+  font-family:'Tajawal',sans-serif;
+  font-size:14px;
+  font-weight:800;
+  cursor:pointer;
+  flex-shrink:0;
+}
+
+.qr-wrap{
+  display:flex;
+  justify-content:center;
+}
+
+.qr-wrap img{
+  width:170px;
+  height:170px;
+  background:#fff;
+  border-radius:14px;
+  padding:8px;
+  object-fit:contain;
+}
+
+.teacher-status{
+  margin-top:12px;
+  font-size:13px;
+  text-align:center;
+  color:#4b5563;
+}
+
+.teacher-status.error{
+  color:#b42318;
+}
+
+.teacher-status.success{
+  color:#16794c;
+}
+
+@media (max-width:900px){
+  .right{
+    padding:100px 18px 28px;
+  }
+
   .brand{
-    top:14px;
+    top:20px;
+    right:18px;
+  }
+
+  .brand .ar{
+    font-size:19px;
+  }
+
+  .brand .en{
+    font-size:12px;
+  }
+
+  .card{
+    width:min(100%,560px);
+    padding:34px 22px 26px;
+    border-radius:24px;
+  }
+
+  .card h1{
+    font-size:46px;
+  }
+
+  .sub{
+    font-size:30px;
+  }
+
+  .desc{
+    font-size:15px;
+    margin-bottom:22px;
+  }
+
+  .field{
+    min-height:74px;
+    border-radius:18px;
+  }
+
+  .field input{
+    height:74px;
+    font-size:24px;
+  }
+
+  .tag{
+    font-size:15px;
+  }
+
+  .help{
+    font-size:15px;
+  }
+
+  .btn{
+    min-height:72px;
+    border-radius:18px;
+    padding:0 20px;
+  }
+
+  .btn .en,
+  .btn .ar{
+    font-size:18px;
+  }
+
+  .session-grid{
+    grid-template-columns:1fr;
+  }
+
+  .generated-link-wrap{
+    flex-direction:column;
+  }
+
+  .generated-link-wrap input,
+  .copy-btn{
+    width:100%;
+  }
+}
+
+@media (max-width:600px){
+  .right{
+    padding:86px 14px 20px;
+  }
+
+  .brand{
+    top:16px;
     right:14px;
   }
-  .brand .ar{ font-size:14px; }
-  .brand .en{ font-size:11px; }
 
-  /* "نرجع النصوص داخل البار" */
-  .tag{ display:block; }
-
-  /* "نخلي النصوص أصغر شوي عشان ما تزحم" */
-  .tag{ font-size:12px; max-width:45%; }
-
-  /* "input يكون واضح ومركز" */
-  input{
-    padding-left:140px;
-    padding-right:140px;
-    text-align:center;
+  .brand .ar{
+    font-size:16px;
   }
 
-  /* "وقت الكتابة: نخفي النصوص ونخلي المساحة كاملة" */
-  .field:focus-within input,
-  .field.has-value input{
-    padding-left:0;
-    padding-right:0;
+  .brand .en{
+    font-size:11px;
+  }
+
+  .card{
+    padding:26px 16px 20px;
+    border-radius:20px;
+  }
+
+  .card h1{
+    font-size:40px;
+  }
+
+  .sub{
+    font-size:25px;
+  }
+
+  .desc{
+    font-size:14px;
+    margin-bottom:18px;
+  }
+
+  .field{
+    min-height:66px;
+    padding:0 16px;
+  }
+
+  .field input{
+    height:66px;
+    font-size:20px;
+  }
+
+  .tag{
+    font-size:13px;
+  }
+
+  .tag.en{
+    left:16px;
+  }
+
+  .tag.ar{
+    right:16px;
+  }
+
+  .help{
+    font-size:14px;
+    margin-top:12px;
+    margin-bottom:16px;
+  }
+
+  .btn{
+    min-height:66px;
+    padding:0 16px;
+  }
+
+  .btn .en,
+  .btn .ar{
+    font-size:16px;
+  }
+
+  .status{
+    font-size:15px;
+  }
+
+  .teacher-fab{
+    width:52px;
+    height:52px;
+    left:14px;
+    bottom:14px;
+    font-size:21px;
+  }
+
+  .teacher-panel{
+    width:min(100%,360px);
+    padding:16px;
+    border-radius:18px;
+  }
+
+  .teacher-password-panel{
+    width:min(100%,320px);
+  }
+
+  .qr-wrap img{
+    width:150px;
+    height:150px;
   }
 }
-
